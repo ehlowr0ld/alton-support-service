@@ -141,24 +141,3 @@ EMBEDDING_MODEL=openai/text-embedding-3-small
 **Benchmark on the mock.** This is the one rule to hold to. A real model's latency moves with provider load and its output moves with temperature, so a before-and-after against a real model tells you very little about your change and costs money to learn it. Develop against `openrouter` when the model's actual behaviour matters — does the classifier get this ticket right, is the answer any good — and switch to `mock` whenever you are measuring.
 
 Everything in the service calls the three functions in `app/services/model_client.py` and never a provider directly. That indirection is why the switch is a single environment variable, and it is worth noticing as a pattern: it is the same reason production services wrap their model vendors.
-
----
-
-## Breaking it on purpose
-
-From Sprint 3 you need dependencies that misbehave. Set these in `.env` or inline, no code change needed:
-
-```bash
-FAULT_MODEL_ERROR_RATE=0.3      # 30% of model calls raise
-FAULT_MODEL_EXTRA_LATENCY=2.0   # every model call takes 2s longer
-FAULT_RETRIEVAL_DOWN=true       # the help-centre index is unreachable
-FAULT_TOOL_ERROR_RATE=0.5       # the billing system returns 502 half the time
-FAULT_TOOL_EXTRA_LATENCY=3.0
-```
-
-```bash
-FAULT_TOOL_ERROR_RATE=0.5 uvicorn app.main:app
-```
-
-Try one now and send a request. Watch what the customer gets back.
-
