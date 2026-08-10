@@ -1,0 +1,41 @@
+---
+description: Alton support triage service — how to work in this repo
+alwaysApply: true
+---
+
+# Working in this repo
+
+This is a course project. The point is that *you* understand the service and can
+defend the decisions in it, not that the code reaches a finished state fastest.
+Use the AI here the way you would use a colleague who types quickly: ask it to
+explain, to review, to try an approach — then read what came back and decide.
+
+## What the service is
+
+FastAPI service that triages customer support tickets for Alton Energy. One
+endpoint, `POST /v1/triage`. Per request: classify urgency (model) → look up the
+account (external tool) → retrieve help articles (embeddings) → draft an answer
+(model). Start reading at `app/main.py`, then `app/services/triage.py`.
+
+## Rules for changes
+
+- Model calls go through `app/services/model_client.py`. Never call a provider
+  directly from `triage.py` or `retrieval.py`.
+- Two providers: `mock` (offline, free, deterministic) and `openrouter` (real).
+  Selected by `MODEL_PROVIDER`. Any change must keep both working.
+- Load testing runs on the mock. Do not benchmark against a real model — the
+  numbers move on their own and it costs money.
+- Never hardcode an API key. It comes from `.env`, which is gitignored.
+- Every performance or reliability claim needs evidence from
+  `scripts/load_probe.py` or `scripts/analyze_logs.py`, not an assertion.
+- Keep `pytest` green.
+
+## Things in this repo that look wrong and are not
+
+- The endpoint is `async def` but the calls inside it block. That is the Sprint 1
+  problem. Do not "fix" it before the sprint asks you to.
+- `retrieval.search()` re-embeds the whole corpus every request. That is the
+  Sprint 2 problem.
+- Nothing handles a failing dependency. That is the Sprint 3 problem.
+- Mock latency values in `config.py` are deliberately slow. Lowering them is not
+  a performance improvement.

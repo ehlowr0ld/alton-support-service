@@ -1,0 +1,10 @@
+{
+  "ALT-10023": {"tariff": "Alton Fix 24", "status": "active", "last_invoice_eur": 128.4, "region": "Bayern"},
+  "ALT-10024": {"tariff": "Alton Green", "status": "active", "last_invoice_eur": 96.15, "region": "Berlin"},
+  "ALT-10031": {"tariff": "Alton Basis", "status": "payment_reminder", "last_invoice_eur": 212.0, "region": "NRW"},
+  "ALT-10047": {"tariff": "Alton Fix 12", "status": "active", "last_invoice_eur": 74.9, "region": "Hessen"},
+  "ALT-10052": {"tariff": "Alton Green", "status": "switching_in", "last_invoice_eur": 0.0, "region": "Bayern"},
+  "ALT-10066": {"tariff": "Alton Basis", "status": "closed", "last_invoice_eur": 41.25, "region": "Sachsen"},
+  "ALT-10078": {"tariff": "Alton Fix 24", "status": "active", "last_invoice_eur": 155.8, "region": "Hamburg"},
+  "ALT-10090": {"tariff": "Alton Green Plus", "status": "active", "last_invoice_eur": 187.3, "region": "Baden-Wuerttemberg"}
+}
