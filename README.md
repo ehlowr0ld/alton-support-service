@@ -162,15 +162,3 @@ FAULT_TOOL_ERROR_RATE=0.5 uvicorn app.main:app
 
 Try one now and send a request. Watch what the customer gets back.
 
----
-
-## What is deliberately missing
-
-The baseline is honest about being a baseline. It has no caching, nothing runs concurrently, no failure is handled, and there is no health endpoint. Those are your deliverables, not oversights:
-
-- **Sprint 1** — get the blocking work off the request path and handle concurrent traffic.
-- **Sprint 2** — stop paying for the same computation twice.
-- **Sprint 3** — keep the service useful when a dependency is not.
-- **Sprint 4** — load-test it, tune what the evidence points at, and write down why.
-
-There is one specific thing worth finding on your own before Sprint 1 ends: `retrieval.search()` does something on every request that it only ever needed to do once. Look at what it costs in `steps_ms` before you decide how much it matters.
