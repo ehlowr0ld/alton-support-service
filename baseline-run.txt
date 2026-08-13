@@ -1,0 +1,11 @@
+
+requests        20 at concurrency 5
+wall clock      30.40 s
+throughput      0.66 req/s
+success         20   failed 0
+latency p50     7664 ms
+latency p95     7673 ms
+latency max     7676 ms
+cost total      EUR 0.1040
+cost per req    EUR 0.00520
+

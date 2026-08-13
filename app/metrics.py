@@ -10,6 +10,7 @@ to show that caching reduced cost, you show it from here.
 from contextvars import ContextVar
 from dataclasses import dataclass, field
 from typing import Dict, Optional
+from .config import settings
 
 _current: ContextVar[Optional["RequestMetrics"]] = ContextVar("request_metrics", default=None)
 
@@ -22,11 +23,11 @@ class RequestMetrics:
     tokens: int = 0
     cost_eur: float = 0.0
 
-    def record(self, step: str, duration_s: float, *, tokens: int = 0, cost_eur: float = 0.0) -> None:
+    def record(self, step: str, duration_s: float, *, tokens: int = 0, cost_usd: float = 0.0) -> None:
         self.steps_ms[step] = round(self.steps_ms.get(step, 0.0) + duration_s * 1000, 2)
         self.calls[step] = self.calls.get(step, 0) + 1
         self.tokens += tokens
-        self.cost_eur = round(self.cost_eur + cost_eur, 6)
+        self.cost_eur = round(self.cost_eur + cost_usd * settings.eur_per_usd, 6)
 
     def as_log_fields(self) -> dict:
         return {
@@ -45,7 +46,7 @@ def current() -> Optional[RequestMetrics]:
     return _current.get()
 
 
-def record(step: str, duration_s: float, *, tokens: int = 0, cost_eur: float = 0.0) -> None:
+def record(step: str, duration_s: float, *, tokens: int = 0, cost_usd: float = 0.0) -> None:
     metrics = current()
     if metrics is not None:
-        metrics.record(step, duration_s, tokens=tokens, cost_eur=cost_eur)
+        metrics.record(step, duration_s, tokens=tokens, cost_usd=cost_usd)

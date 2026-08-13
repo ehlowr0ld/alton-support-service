@@ -13,7 +13,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "data"
 LOG_DIR = BASE_DIR / "logs"
 
-
 def _env_float(name: str, default: float) -> float:
     return float(os.getenv(name, default))
 
@@ -33,6 +32,11 @@ class Settings:
     version: str = "0.1.0"
     log_level: str = field(default_factory=lambda: os.getenv("LOG_LEVEL", "INFO"))
     log_file: Path = field(default_factory=lambda: LOG_DIR / "service.jsonl")
+    
+    # --- currency ---
+    # Providers bill in USD. Converted to EUR once, in metrics.py.
+    # A pinned assumption, not a live rate — change it deliberately.
+    eur_per_usd: float = field(default_factory=lambda: _env_float("EUR_PER_USD", 0.92))
 
     # --- model provider ---
     # "mock"       offline, deterministic, free — the default, and what load tests use
@@ -71,10 +75,13 @@ class Settings:
     generate_base_latency: float = field(default_factory=lambda: _env_float("GENERATE_BASE_LATENCY", 0.70))
     tool_latency: float = field(default_factory=lambda: _env_float("TOOL_LATENCY", 0.25))
 
-    # --- simulated pricing (EUR per 1k tokens / per call) ---
-    price_generate_per_1k: float = field(default_factory=lambda: _env_float("PRICE_GENERATE_PER_1K", 0.0150))
-    price_classify_per_1k: float = field(default_factory=lambda: _env_float("PRICE_CLASSIFY_PER_1K", 0.0004))
-    price_embed_per_1k: float = field(default_factory=lambda: _env_float("PRICE_EMBED_PER_1K", 0.0002))
+    # --- simulated pricing (USD per 1k tokens) ---
+    # Deliberately round numbers, not a copy of any vendor's price list.
+    # They are the module's cost model: on mock, every cost figure comes
+    # from here. Converted to EUR in metrics.py.
+    price_generate_usd_per_1k: float = field(default_factory=lambda: _env_float("PRICE_GENERATE_USD_PER_1K", 0.0150))
+    price_classify_usd_per_1k: float = field(default_factory=lambda: _env_float("PRICE_CLASSIFY_USD_PER_1K", 0.0004))
+    price_embed_usd_per_1k: float = field(default_factory=lambda: _env_float("PRICE_EMBED_USD_PER_1K", 0.0002))
 
     # --- retrieval ---
     retrieval_top_k: int = field(default_factory=lambda: _env_int("RETRIEVAL_TOP_K", 3))

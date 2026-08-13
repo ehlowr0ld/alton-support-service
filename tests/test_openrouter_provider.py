@@ -15,6 +15,7 @@ import pytest
 from app.services import model_client
 from app.services.errors import ModelUnavailable
 from app.services.providers import openrouter_provider as orp
+from app.config import settings
 
 
 @pytest.fixture
@@ -50,7 +51,7 @@ def test_reported_cost_is_used_instead_of_the_fallback_price(monkeypatch, openro
     set_current(metrics)
     monkeypatch.setattr(orp, "_post", lambda path, payload: _chat_body("an answer", cost=0.0075))
     model_client.generate("some prompt")
-    assert metrics.cost_eur == pytest.approx(0.0075)
+    assert metrics.cost_eur == pytest.approx(0.0075 * settings.eur_per_usd)
 
 
 def test_embeddings_come_back_in_order_and_unit_length(monkeypatch, openrouter_mode):

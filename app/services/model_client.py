@@ -65,7 +65,7 @@ def classify_urgency(text: str) -> Tuple[str, float]:
         "classify",
         time.perf_counter() - started,
         tokens=tokens,
-        cost_eur=_price(tokens, settings.price_classify_per_1k, cost),
+        cost_usd=_price(tokens, settings.price_classify_usd_per_1k, cost),
     )
     return label, confidence
 
@@ -88,7 +88,7 @@ def embed(texts: Sequence[str]) -> List[List[float]]:
         "embed",
         time.perf_counter() - started,
         tokens=tokens,
-        cost_eur=_price(tokens, settings.price_embed_per_1k, cost),
+        cost_usd=_price(tokens, settings.price_embed_usd_per_1k, cost),
     )
     return vectors
 
@@ -111,6 +111,6 @@ def generate(prompt: str, *, max_tokens: int = 400) -> str:
         "generate",
         time.perf_counter() - started,
         tokens=tokens,
-        cost_eur=_price(tokens, settings.price_generate_per_1k, cost),
+        cost_usd=_price(tokens, settings.price_generate_usd_per_1k, cost),
     )
     return answer
