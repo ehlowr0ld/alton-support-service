@@ -35,9 +35,27 @@ async def request_context(request: Request, call_next):
     set_current(RequestMetrics(request_id=request_id))
     started = time.perf_counter()
 
+    request_log_fields:dict = {}
+    if (current_request := current()) is not None:
+        request_log_fields = current_request.as_log_fields()
+
     try:
         response = await call_next(request)
-    except Exception:
+        duration_ms = round((time.perf_counter() - started) * 1000, 2)
+        response.headers["x-request-id"] = request_id
+        logger.info(
+            "request completed",
+            extra={
+                "request_id": request_id,
+                "path": request.url.path,
+                "method": request.method,
+                "status": response.status_code,
+                "duration_ms": duration_ms,
+                **request_log_fields,
+            },
+        )
+        return response
+    except Exception as e:
         duration_ms = round((time.perf_counter() - started) * 1000, 2)
         logger.exception(
             "request failed",
@@ -47,25 +65,10 @@ async def request_context(request: Request, call_next):
                 "method": request.method,
                 "status": 500,
                 "duration_ms": duration_ms,
-                **(current().as_log_fields() if current() else {}),
+                **request_log_fields,
             },
         )
-        raise
-
-    duration_ms = round((time.perf_counter() - started) * 1000, 2)
-    response.headers["x-request-id"] = request_id
-    logger.info(
-        "request completed",
-        extra={
-            "request_id": request_id,
-            "path": request.url.path,
-            "method": request.method,
-            "status": response.status_code,
-            "duration_ms": duration_ms,
-            **(current().as_log_fields() if current() else {}),
-        },
-    )
-    return response
+        raise e
 
 
 # The endpoint is declared async but every call inside it is blocking.
