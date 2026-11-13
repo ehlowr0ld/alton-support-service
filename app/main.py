@@ -76,7 +76,7 @@ async def request_context(request: Request, call_next):
 @app.post("/v1/triage", response_model=TriageResponse)
 async def triage(payload: TriageRequest) -> TriageResponse:
     metrics = current()
-    result = triage_ticket(
+    result = await triage_ticket(
         ticket_text=payload.ticket_text,
         account_id=payload.account_id,
         top_k=payload.top_k,

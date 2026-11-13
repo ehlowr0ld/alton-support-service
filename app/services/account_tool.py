@@ -17,7 +17,7 @@ from .errors import ToolUnavailable
 ACCOUNTS_PATH = DATA_DIR / "accounts.json"
 
 
-def lookup_account(account_id: str) -> Optional[Dict]:
+async def lookup_account(account_id: str) -> Optional[Dict]:
     """Fetch account and tariff details. Returns None if the account is unknown."""
     started = time.perf_counter()
 

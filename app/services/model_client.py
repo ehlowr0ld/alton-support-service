@@ -47,7 +47,7 @@ def _price(tokens: int, per_1k: float, reported_cost: Optional[float]) -> float:
     return reported_cost if reported_cost is not None else tokens / 1000 * per_1k
 
 
-def classify_urgency(text: str) -> Tuple[str, float]:
+async def classify_urgency(text: str) -> Tuple[str, float]:
     """Return (label, confidence) for a support ticket."""
     started = time.perf_counter()
     _maybe_fail(settings.fault_model_error_rate, "classifier returned 503")
@@ -70,7 +70,7 @@ def classify_urgency(text: str) -> Tuple[str, float]:
     return label, confidence
 
 
-def embed(texts: Sequence[str]) -> List[List[float]]:
+async def embed(texts: Sequence[str]) -> List[List[float]]:
     """Embed a batch of strings. Vectors come back unit length."""
     started = time.perf_counter()
     _maybe_fail(settings.fault_model_error_rate, "embedding endpoint returned 503")
@@ -93,7 +93,7 @@ def embed(texts: Sequence[str]) -> List[List[float]]:
     return vectors
 
 
-def generate(prompt: str, *, max_tokens: int = 400) -> str:
+async def generate(prompt: str, *, max_tokens: int = 400) -> str:
     """Generate an answer for a prompt."""
     started = time.perf_counter()
     _maybe_fail(settings.fault_model_error_rate, "generation endpoint returned 503")

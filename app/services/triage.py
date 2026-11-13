@@ -21,22 +21,22 @@ from . import account_tool, model_client, retrieval
 logger = logging.getLogger(__name__)
 
 
-def triage_ticket(
+async def triage_ticket(
     ticket_text: str,
     account_id: Optional[str] = None,
     top_k: Optional[int] = None,
 ) -> Dict:
     started = time.perf_counter()
 
-    urgency, confidence = model_client.classify_urgency(ticket_text)
+    urgency, confidence = await model_client.classify_urgency(ticket_text)
     logger.debug("classified ticket", extra={"urgency": urgency, "confidence": confidence})
 
-    account = account_tool.lookup_account(account_id) if account_id else None
+    account = await account_tool.lookup_account(account_id) if account_id else None
 
-    articles = retrieval.search(ticket_text, top_k=top_k or settings.retrieval_top_k)
+    articles = await retrieval.search(ticket_text, top_k=top_k or settings.retrieval_top_k)
 
     prompt = _build_prompt(ticket_text, articles, account)
-    answer = model_client.generate(prompt)
+    answer = await model_client.generate(prompt)
 
     return {
         "urgency": urgency,

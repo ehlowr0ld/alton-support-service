@@ -19,22 +19,22 @@ from .errors import RetrievalUnavailable
 CORPUS_PATH = DATA_DIR / "help_center.jsonl"
 
 
-def load_corpus() -> List[Dict]:
+async def load_corpus() -> List[Dict]:
     with CORPUS_PATH.open(encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
 
 
-def search(query: str, top_k: int | None = None) -> List[Dict]:
+async def search(query: str, top_k: int | None = None) -> List[Dict]:
     """Return the top_k most similar help-centre articles for a query."""
     if settings.fault_retrieval_down:
         raise RetrievalUnavailable("help-centre index unreachable")
 
     top_k = top_k or settings.retrieval_top_k
-    corpus = load_corpus()
+    corpus = await load_corpus()
 
     doc_texts = [f"{doc['title']} {doc['body']}" for doc in corpus]
-    doc_vectors = model_client.embed(doc_texts)
-    query_vector = model_client.embed([query])[0]
+    doc_vectors = await model_client.embed(doc_texts)
+    query_vector = (await model_client.embed([query]))[0]
 
     scored = [
         {**doc, "score": round(_cosine(query_vector, vector), 4)}
